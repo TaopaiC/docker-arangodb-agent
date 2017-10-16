@@ -3,6 +3,7 @@
 
 import os
 
+import boto.util
 import boto3
 import requests
 
