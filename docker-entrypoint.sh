@@ -4,7 +4,7 @@ set -o xtrace
 
 echo "collecting container infomamtion..."
 export EC2_HOST=$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2> /dev/null)
-result="$(python /usr/local/bin/ecs-get-port-mapping.py)"
+result="$(python3 /usr/local/bin/ecs-get-port-mapping.py)"
 eval "$result"
 echo "export EC2_HOST=$EC2_HOST"
 echo $result
