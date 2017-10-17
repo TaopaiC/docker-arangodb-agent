@@ -16,7 +16,7 @@ SSM_PATH='/test/1234'
 index=0
 until [ $index -ge 9 ]
 do
-  aws ssm put-parameter --type String --name ${SSM_PATH}/${index} --vaule ${MY_ADDRESS} && break
+  aws ssm put-parameter --type String --name ${SSM_PATH}/${index} --value ${MY_ADDRESS} && break
   index=$[$index+1]
 done
 
