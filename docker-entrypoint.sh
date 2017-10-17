@@ -9,7 +9,7 @@ eval "$result"
 echo "export EC2_HOST=$EC2_HOST"
 echo $result
 
-MY_ADDRESS=${EC2_HOST}:${TCP_PORT_8529}
+MY_ADDRESS=${EC2_HOST}:${TCP_PORT_8528}
 
 SSM_PATH='/test/1234'
 
