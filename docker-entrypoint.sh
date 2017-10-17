@@ -28,7 +28,6 @@ set -- arangod \
   $AGENCY_ENDPOINT_ARGS \
   --agency.my-address $MY_ADDRESS \
   --server.authentication false \
-  --server.endpoint $MY_ADDRESS \
-  "agency-$index" "$@"
+  "$@"
 
 exec "$@"
