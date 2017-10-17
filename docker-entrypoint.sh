@@ -20,7 +20,7 @@ do
   index=$[$index+1]
 done
 
-AGENCY_ENDPOINT_ARGS=`aws ssm get-parameters-by-path --path $SSM_PATH | jq '.Parameters | map(.Value) | map("--agency.endpoint " + .) | join(" ")'`
+AGENCY_ENDPOINT_ARGS=`aws ssm get-parameters-by-path --path $SSM_PATH | jq --raw-output '.Parameters | map(.Value) | map("--agency.endpoint " + .) | join(" ")'`
 
 set -- arangod \
   --agency.activate true \
