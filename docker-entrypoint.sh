@@ -9,7 +9,7 @@ eval "$result"
 echo "export EC2_HOST=$EC2_HOST"
 echo $result
 
-MY_ADDRESS=${EC2_HOST}:${PORT_TCP_8258}
+MY_ADDRESS="tcp://${EC2_HOST}:${PORT_TCP_8258}"
 
 SSM_PATH='/test/1234'
 
@@ -20,7 +20,7 @@ do
   index=$[$index+1]
 done
 
-AGENCY_ENDPOINT_ARGS=`aws ssm get-parameters-by-path --path $SSM_PATH | jq --raw-output '.Parameters | map(.Value) | map("--agency.endpoint " + .) | join(" ")'`
+AGENCY_ENDPOINT_ARGS=`aws ssm get-parameters-by-path --path $SSM_PATH | jq --raw-output '.Parameters | map(.Value) | map("--agency.endpoint tcp://" + .) | join(" ")'`
 
 set -- arangod \
   --agency.activate true \
