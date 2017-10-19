@@ -3,6 +3,27 @@ set -o errexit
 set -o xtrace
 set -o pipefail
 
+function ps_delete()
+{
+  local LOCATION = $1
+  aws ssm delete-parameter --name "${LOCATION}" || echo "Error: unable to delete parameter store ${LOCATION} ."
+}
+
+function ps_set()
+{
+  local LOCATION = $1
+  local VALUE = $2
+
+  aws ssm put-parameter --type String --name "${LOCATION}" --value "${VALUE}"
+}
+
+function ps_list()
+{
+  local LOCATION = $1
+
+  aws ssm get-parameters-by-path --path $LOCATION
+}
+
 echo "collecting container infomamtion..."
 export EC2_HOST=$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2> /dev/null)
 result="$(python3 /usr/local/bin/ecs-get-port-mapping.py)"
@@ -18,7 +39,7 @@ MAX_SIZE=9
 index=0
 until [ $index -ge $MAX_SIZE ]
 do
-  aws ssm put-parameter --type String --name "${SSM_PATH}/${index}" --value "${MY_ADDRESS}" && break
+  ps_set "${SSM_PATH}/${index}" "${MY_ADDRESS}" && break
   index=$[$index+1]
 done
 
@@ -28,7 +49,7 @@ then
   exit 1
 fi
 
-AGENCY_ENDPOINT_ARGS=`aws ssm get-parameters-by-path --path $SSM_PATH | jq --raw-output '.Parameters | map(.Value) | map("--agency.endpoint " + .) | join(" ")'`
+AGENCY_ENDPOINT_ARGS=`ps_list $SSM_PATH | jq --raw-output '.Parameters | map(.Value) | map("--agency.endpoint " + .) | join(" ")'`
 
 set -- arangod \
   --agency.activate true \
@@ -42,7 +63,5 @@ set -- arangod \
   --javascript.v8-contexts 1 \
   "$@"
 
-exec "$@"
-
-aws ssm delete-parameter --name ${SSM_PATH}/${index} || echo "Error: unable to delete parameter store $SSM_PATH/${index}."
-
+exec "$@" || ps_delete "${SSM_PATH}/${index}"
+ps_delete "${SSM_PATH}/${index}"
