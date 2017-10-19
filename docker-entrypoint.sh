@@ -9,7 +9,7 @@ eval "$result"
 echo "export EC2_HOST=$EC2_HOST"
 echo $result
 
-MY_ADDRESS="${EC2_HOST}:${PORT_TCP_8528}"
+MY_ADDRESS="tcp://${EC2_HOST}:${PORT_TCP_8528}"
 
 SSM_PATH='/test/1234'
 
@@ -27,7 +27,11 @@ set -- arangod \
   --agency.size 3 \
   $AGENCY_ENDPOINT_ARGS \
   --agency.my-address $MY_ADDRESS \
+  --agency.supervision true \
   --server.authentication false \
+  --fox.queues false \
+  --server.statistics false \
+  --javascript.v8-contexts 1 \
   "$@"
 
 exec "$@"

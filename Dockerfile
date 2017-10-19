@@ -1,8 +1,8 @@
-FROM arangodb:3.2.4
+FROM arangodb/arangodb:3.2.4
 LABEL maintainer="pctao.tw@gmail.com"
 
 RUN apt-get update \
- && apt-get install -y procps jq python3 python3-requests python3-boto python3-boto3 openssl groff unzip
+ && apt-get install -y procps jq python3 python3-requests python3-boto python3-boto3 openssl groff-base unzip
 
 ADD https://s3.amazonaws.com/aws-cli/awscli-bundle.zip /tmp/awscli-bundle.zip
 
