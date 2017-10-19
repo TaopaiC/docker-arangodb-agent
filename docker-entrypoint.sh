@@ -18,7 +18,7 @@ result="$(/usr/local/bin/get_all_8529.sh)"
 eval "$result"
 echo "$result"
 
-AGENCY_ENDPOINT_ARGS=`echo \"$ALL_PORT_TCP_8529\" | jq "split(\" \") | map(\"--agency.endpoint tcp://\" + .) | join(\" \")"`
+AGENCY_ENDPOINT_ARGS=`echo \"$ALL_PORT_TCP_8529\" | jq -r "split(\" \") | map(\"--agency.endpoint tcp://\" + .) | join(\" \")"`
 
 set -- arangod \
   --agency.activate true \
