@@ -3,29 +3,9 @@ set -o errexit
 set -o xtrace
 set -o pipefail
 
-function ps_delete()
-{
-  local LOCATION=$1
-  aws ssm delete-parameter --name "${LOCATION}" || echo "Error: unable to delete parameter store ${LOCATION} ."
-}
-
-function ps_put()
-{
-  local LOCATION=$1
-  local VALUE=$2
-
-  aws ssm put-parameter --type String --name "${LOCATION}" --value "${VALUE}"
-}
-
-function ps_list()
-{
-  local LOCATION=$1
-
-  aws ssm get-parameters-by-path --path $LOCATION
-}
-
-echo "collecting container infomamtion..."
+echo "collecting container information..."
 export EC2_HOST=$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2> /dev/null)
+
 result="$(python3 /usr/local/bin/ecs-get-port-mapping.py)"
 eval "$result"
 echo "export EC2_HOST=$EC2_HOST"
@@ -33,23 +13,12 @@ echo $result
 
 MY_ADDRESS="tcp://${EC2_HOST}:${PORT_TCP_8529}"
 
-SSM_PATH='/test/1234'
-MAX_SIZE=9
+echo "collecting all 8529 ports information..."
+result="$(/usr/local/bin/get_all_8529.sh)"
+eval "$result"
+echo "$result"
 
-index=0
-until [ $index -ge $MAX_SIZE ]
-do
-  ps_put "${SSM_PATH}/${index}" "${MY_ADDRESS}" && break
-  index=$[$index+1]
-done
-
-if [ $index -ge $MAX_SIZE ]
-then
-  echo "ERROR: parameter store $SSM_PATH : 0 ~ $MAX_SIZE were filled."
-  exit 1
-fi
-
-AGENCY_ENDPOINT_ARGS=`ps_list $SSM_PATH | jq --raw-output '.Parameters | map(.Value) | map("--agency.endpoint " + .) | join(" ")'`
+AGENCY_ENDPOINT_ARGS=`echo \"$ALL_PORT_TCP_8529\" | jq "split(\" \") | map(\"--agency.endpoint tcp://\" + .) | join(\" \")"`
 
 set -- arangod \
   --agency.activate true \
@@ -63,5 +32,4 @@ set -- arangod \
   --javascript.v8-contexts 1 \
   "$@"
 
-exec "$@" || ps_delete "${SSM_PATH}/${index}"
-ps_delete "${SSM_PATH}/${index}"
+exec "$@"
