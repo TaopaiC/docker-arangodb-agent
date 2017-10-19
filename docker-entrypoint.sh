@@ -29,7 +29,7 @@ set -- arangod \
   --agency.my-address $MY_ADDRESS \
   --agency.supervision true \
   --server.authentication false \
-  --fox.queues false \
+  --foxx.queues false \
   --server.statistics false \
   --javascript.v8-contexts 1 \
   "$@"
