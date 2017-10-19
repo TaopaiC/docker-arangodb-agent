@@ -5,21 +5,21 @@ set -o pipefail
 
 function ps_delete()
 {
-  local LOCATION = $1
+  local LOCATION=$1
   aws ssm delete-parameter --name "${LOCATION}" || echo "Error: unable to delete parameter store ${LOCATION} ."
 }
 
-function ps_set()
+function ps_put()
 {
-  local LOCATION = $1
-  local VALUE = $2
+  local LOCATION=$1
+  local VALUE=$2
 
   aws ssm put-parameter --type String --name "${LOCATION}" --value "${VALUE}"
 }
 
 function ps_list()
 {
-  local LOCATION = $1
+  local LOCATION=$1
 
   aws ssm get-parameters-by-path --path $LOCATION
 }
@@ -39,7 +39,7 @@ MAX_SIZE=9
 index=0
 until [ $index -ge $MAX_SIZE ]
 do
-  ps_set "${SSM_PATH}/${index}" "${MY_ADDRESS}" && break
+  ps_put "${SSM_PATH}/${index}" "${MY_ADDRESS}" && break
   index=$[$index+1]
 done
 
