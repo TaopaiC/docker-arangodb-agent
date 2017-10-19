@@ -14,4 +14,3 @@ RUN unzip -d /tmp/ /tmp/awscli-bundle.zip \
 COPY ecs-get-port-mapping.py /usr/local/bin/ecs-get-port-mapping.py
 COPY docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-EXPOSE 8528
